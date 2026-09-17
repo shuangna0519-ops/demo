@@ -1,0 +1,3 @@
+# 开发/测试依赖（运行 pytest 用例时安装）
+-r requirements.txt
+pytest~=8.3

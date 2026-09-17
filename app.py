@@ -1,5 +1,6 @@
 import os
 import datetime
+from contextlib import closing
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -36,19 +37,32 @@ TEMPLATE_MATCHERS = {
 
 
 def init_db():
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS history (
-            id SERIAL PRIMARY KEY,
-            description TEXT NOT NULL,
-            template_name TEXT NOT NULL,
-            created_at TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    cur.close()
-    conn.close()
+    with closing(get_connection()) as conn:
+        with conn.cursor() as cur:
+            cur.execute('''
+                CREATE TABLE IF NOT EXISTS history (
+                    id SERIAL PRIMARY KEY,
+                    description TEXT NOT NULL,
+                    template_name TEXT NOT NULL,
+                    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            # 兼容旧库：把 TEXT 类型的 created_at 平滑迁移到 TIMESTAMP
+            cur.execute(
+                "SELECT data_type FROM information_schema.columns "
+                "WHERE table_name = 'history' AND column_name = 'created_at'"
+            )
+            col_type = cur.fetchone()
+            if col_type and col_type[0] != 'timestamp without time zone':
+                cur.execute(
+                    'ALTER TABLE history ALTER COLUMN created_at '
+                    'TYPE TIMESTAMP USING created_at::timestamp'
+                )
+                cur.execute(
+                    'ALTER TABLE history ALTER COLUMN created_at '
+                    'SET DEFAULT CURRENT_TIMESTAMP'
+                )
+        conn.commit()
 
 
 def match_template(description):
@@ -76,13 +90,19 @@ def vite_client():
 
 @app.route('/')
 def index():
-    conn = get_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM history ORDER BY created_at DESC')
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    history = [dict(r) for r in rows]
+    with closing(get_connection()) as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                'SELECT id, description, template_name, created_at '
+                'FROM history ORDER BY created_at DESC, id DESC'
+            )
+            rows = cur.fetchall()
+    history = []
+    for r in rows:
+        item = dict(r)
+        if isinstance(item['created_at'], datetime.datetime):
+            item['created_at'] = item['created_at'].strftime('%Y-%m-%d %H:%M:%S')
+        history.append(item)
     return render_template('index.html', history=history)
 
 
@@ -95,20 +115,23 @@ def generate():
 
     template_name = match_template(description)
     html = load_template_html(template_name)
-    created_at = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    conn = get_connection()
-    cur = conn.cursor()
-    cur.execute(
-        'INSERT INTO history (description, template_name, created_at) VALUES (%s, %s, %s) RETURNING id',
-        (description, template_name, created_at),
-    )
-    row = cur.fetchone()
-    assert row is not None, 'INSERT 未返回 id'
-    new_id = row[0]
-    conn.commit()
-    cur.close()
-    conn.close()
+    with closing(get_connection()) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                'INSERT INTO history (description, template_name) '
+                'VALUES (%s, %s) RETURNING id, created_at',
+                (description, template_name),
+            )
+            row = cur.fetchone()
+        conn.commit()
+
+    assert row is not None, 'INSERT 未返回记录'
+    new_id, created_at_value = row
+    if isinstance(created_at_value, datetime.datetime):
+        created_at = created_at_value.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        created_at = str(created_at_value)
 
     return jsonify({
         'id': new_id,
