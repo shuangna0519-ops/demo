@@ -103,7 +103,9 @@ def generate():
         'INSERT INTO history (description, template_name, created_at) VALUES (%s, %s, %s) RETURNING id',
         (description, template_name, created_at),
     )
-    new_id = cur.fetchone()[0]
+    row = cur.fetchone()
+    assert row is not None, 'INSERT 未返回 id'
+    new_id = row[0]
     conn.commit()
     cur.close()
     conn.close()
