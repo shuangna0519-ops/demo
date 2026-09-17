@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Courier New', monospace; background: #1a1a2e; min-height: 100vh; display: flex; align-items: center; justify-content: center; color: white; }
+    .clock-container { text-align: center; }
+    .time { font-size: 72px; font-weight: bold; letter-spacing: 4px; text-shadow: 0 0 20px rgba(78, 205, 196, 0.5); }
+    .date { font-size: 20px; color: #a29bfe; margin-top: 12px; }
+    .second { color: #4ecdc4; }
+</style>
+</head>
+<body>
+<div class="clock-container">
+    <div class="time" id="time">00:00:00</div>
+    <div class="date" id="date">加载中...</div>
+</div>
+<script>
+function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const s = String(now.getSeconds()).padStart(2, '0');
+    document.getElementById('time').innerHTML = `${h}:${m}:<span class="second">${s}</span>`;
+    const days = ['日', '一', '二', '三', '四', '五', '六'];
+    document.getElementById('date').textContent =
+        `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 星期${days[now.getDay()]}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

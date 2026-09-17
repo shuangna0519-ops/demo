@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, sans-serif; background: #2c3e50; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .calculator { background: #ecf0f1; border-radius: 16px; padding: 20px; width: 300px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+    .display { background: #34495e; color: white; text-align: right; padding: 20px; border-radius: 10px; font-size: 28px; margin-bottom: 16px; min-height: 60px; overflow: hidden; word-wrap: break-word; }
+    .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    button { padding: 16px; font-size: 18px; border: none; border-radius: 10px; cursor: pointer; background: #bdc3c7; transition: 0.1s; }
+    button:active { transform: scale(0.95); }
+    .op { background: #f39c12; color: white; }
+    .eq { background: #27ae60; color: white; grid-column: span 2; }
+    .clear { background: #e74c3c; color: white; }
+</style>
+</head>
+<body>
+<div class="calculator">
+    <div class="display" id="display">0</div>
+    <div class="buttons">
+        <button class="clear" onclick="clearAll()">C</button>
+        <button onclick="backspace()">⌫</button>
+        <button class="op" onclick="append('%')">%</button>
+        <button class="op" onclick="append('/')">÷</button>
+        <button onclick="append('7')">7</button>
+        <button onclick="append('8')">8</button>
+        <button onclick="append('9')">9</button>
+        <button class="op" onclick="append('*')">×</button>
+        <button onclick="append('4')">4</button>
+        <button onclick="append('5')">5</button>
+        <button onclick="append('6')">6</button>
+        <button class="op" onclick="append('-')">−</button>
+        <button onclick="append('1')">1</button>
+        <button onclick="append('2')">2</button>
+        <button onclick="append('3')">3</button>
+        <button class="op" onclick="append('+')">+</button>
+        <button onclick="append('0')">0</button>
+        <button onclick="append('.')">.</button>
+        <button class="eq" onclick="calculate()">=</button>
+    </div>
+</div>
+<script>
+let expr = '';
+const display = document.getElementById('display');
+function append(v) {
+    if (expr === '0' && /[0-9]/.test(v)) expr = '';
+    expr += v;
+    display.textContent = expr;
+}
+function clearAll() { expr = ''; display.textContent = '0'; }
+function backspace() { expr = expr.slice(0, -1); display.textContent = expr || '0'; }
+function calculate() {
+    try {
+        const result = Function('"use strict";return (' + expr.replace(/%/g, '/100') + ')')();
+        expr = String(result);
+        display.textContent = expr;
+    } catch (e) {
+        display.textContent = '错误';
+        expr = '';
+    }
+}
+</script>
+</body>
+</html>

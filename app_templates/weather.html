@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: linear-gradient(135deg, #74b9ff, #0984e3); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: rgba(255,255,255,0.95); border-radius: 20px; padding: 30px; width: 100%; max-width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+    .city { font-size: 24px; font-weight: 600; color: #2d3436; text-align: center; }
+    .weather-icon { text-align: center; font-size: 72px; margin: 16px 0; }
+    .temp { text-align: center; font-size: 56px; font-weight: 300; color: #2d3436; }
+    .desc { text-align: center; color: #636e72; margin-top: 8px; font-size: 16px; }
+    .details { display: flex; justify-content: space-around; margin-top: 24px; padding-top: 20px; border-top: 1px solid #eee; }
+    .detail-item { text-align: center; }
+    .detail-item .label { font-size: 12px; color: #b2bec3; }
+    .detail-item .value { font-size: 18px; font-weight: 600; color: #2d3436; margin-top: 4px; }
+    .refresh { display: block; margin: 20px auto 0; padding: 8px 20px; background: #0984e3; color: white; border: none; border-radius: 20px; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="card">
+    <div class="city">北京市</div>
+    <div class="weather-icon" id="icon">☀️</div>
+    <div class="temp" id="temp">24°</div>
+    <div class="desc" id="desc">晴朗</div>
+    <div class="details">
+        <div class="detail-item"><div class="label">湿度</div><div class="value" id="humidity">45%</div></div>
+        <div class="detail-item"><div class="label">风速</div><div class="value" id="wind">12 km/h</div></div>
+        <div class="detail-item"><div class="label">体感</div><div class="value" id="feels">23°</div></div>
+    </div>
+    <button class="refresh" onclick="refresh()">🔄 刷新</button>
+</div>
+<script>
+const weathers = [
+    { icon: '☀️', desc: '晴朗', temp: 24, humidity: 45, wind: 12, feels: 23 },
+    { icon: '⛅', desc: '多云', temp: 21, humidity: 55, wind: 18, feels: 20 },
+    { icon: '🌧️', desc: '小雨', temp: 18, humidity: 80, wind: 22, feels: 16 },
+    { icon: '⛈️', desc: '雷阵雨', temp: 19, humidity: 85, wind: 30, feels: 17 },
+    { icon: '❄️', desc: '小雪', temp: -2, humidity: 70, wind: 15, feels: -5 },
+];
+function refresh() {
+    const w = weathers[Math.floor(Math.random() * weathers.length)];
+    document.getElementById('icon').textContent = w.icon;
+    document.getElementById('temp').textContent = w.temp + '°';
+    document.getElementById('desc').textContent = w.desc;
+    document.getElementById('humidity').textContent = w.humidity + '%';
+    document.getElementById('wind').textContent = w.wind + ' km/h';
+    document.getElementById('feels').textContent = w.feels + '°';
+}
+</script>
+</body>
+</html>
