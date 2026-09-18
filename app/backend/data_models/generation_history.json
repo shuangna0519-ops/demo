@@ -1,0 +1,53 @@
+{
+    "title": "generation_history",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer",
+            "description": "自增主键"
+        },
+        "description": {
+            "type": "string",
+            "description": "用户最初输入的应用描述"
+        },
+        "template_name": {
+            "type": "string",
+            "description": "内置示例模板名（todo/weather/clock/calculator/default），智能体生成时为空字符串"
+        },
+        "app_title": {
+            "type": "string",
+            "description": "应用标题，如 数独小游戏"
+        },
+        "category": {
+            "type": "string",
+            "description": "应用分类，如 小游戏/效率工具/数据展示/其他"
+        },
+        "kind": {
+            "type": "string",
+            "description": "生成来源：agent 表示智能体生成，builtin 表示内置示例模板"
+        },
+        "html_code": {
+            "type": "string",
+            "description": "智能体生成的完整单文件 HTML 代码"
+        },
+        "plan_summary": {
+            "type": "string",
+            "description": "智能体规划出的应用规格摘要"
+        },
+        "model": {
+            "type": "string",
+            "description": "生成使用的模型名称"
+        },
+        "version": {
+            "type": "integer",
+            "description": "迭代版本号，初始为 1"
+        },
+        "instruction": {
+            "type": "string",
+            "description": "最近一次迭代指令，无迭代时为空字符串"
+        }
+    },
+    "required": [
+        "description"
+    ]
+}

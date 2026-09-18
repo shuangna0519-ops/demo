@@ -1,0 +1,22 @@
+[
+    {
+        "description": "一个待办清单，可以添加和勾选任务",
+        "template_name": "todo"
+    },
+    {
+        "description": "天气卡片，显示当前气温和未来几天预报",
+        "template_name": "weather"
+    },
+    {
+        "description": "一个简洁的数字时钟",
+        "template_name": "clock"
+    },
+    {
+        "description": "帮我做一个计算器",
+        "template_name": "calculator"
+    },
+    {
+        "description": "帮我做一个团队协作的数据看板",
+        "template_name": "default"
+    }
+]
